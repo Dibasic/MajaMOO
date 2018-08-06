@@ -1,3 +1,3 @@
 # Copyright
 
-Copyright 2018. Personal use only. All other rights reserved.
+Copyright Ethan Jorgensen 2018. Personal use only. Confidential, dissemination prohibited. All rights reserved.
