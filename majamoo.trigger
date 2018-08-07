@@ -3,7 +3,7 @@
 <MudletPackage version="1.001">
 	<TriggerPackage>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-			<name>Weapon Management (DISABLE IF YOU ARE NOT GUNS)</name>
+			<name>guns</name>
 			<script></script>
 			<triggerType>0</triggerType>
 			<conditonLineDelta>0</conditonLineDelta>
@@ -174,7 +174,7 @@ end</script>
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^(.+) flips her (.+) to (single|auto) mode\.$</string>
+					<string>^(.+) flips her (.+) to (single|burst|auto) mode\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -863,7 +863,7 @@ end</script>
 	<TimerPackage />
 	<AliasPackage>
 		<AliasGroup isActive="yes" isFolder="yes">
-			<name>debug</name>
+			<name>internal</name>
 			<script></script>
 			<command></command>
 			<packageName>run-lua-code-v4</packageName>
@@ -894,23 +894,6 @@ echo("\n")</script>
 			</Alias>
 		</AliasGroup>
 		<Alias isActive="yes" isFolder="no">
-			<name>setup ammo</name>
-			<script>set_weapon(matches[2])
-set_ammo(matches[3])</script>
-			<command></command>
-			<packageName></packageName>
-			<regex>^ammo (.+) (.+)$</regex>
-		</Alias>
-		<Alias isActive="yes" isFolder="no">
-			<name>reload and repack</name>
-			<script>send("unload " .. weapon)
-tempTimer(0.01, [[send("combine " .. ammo)]])
-tempTimer(0.02, [[send("load " .. weapon)]])</script>
-			<command></command>
-			<packageName></packageName>
-			<regex>^(?:rl|reload|rp|repack)$</regex>
-		</Alias>
-		<Alias isActive="yes" isFolder="no">
 			<name>wield</name>
 			<script>set_weapon(matches[2])
 send(matches[1])</script>
@@ -930,6 +913,30 @@ end</script>
 			<packageName></packageName>
 			<regex>^connect ([^\s]+) .*</regex>
 		</Alias>
+		<AliasGroup isActive="yes" isFolder="yes">
+			<name>gun</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>setup ammo</name>
+				<script>set_weapon(matches[2])
+set_ammo(matches[3])</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^ammo (.+) (.+)$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>reload and repack</name>
+				<script>send("unload " .. weapon)
+tempTimer(0.01, [[send("combine " .. ammo)]])
+tempTimer(0.02, [[send("load " .. weapon)]])</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^(?:rl|reload|rp|repack)$</regex>
+			</Alias>
+		</AliasGroup>
 	</AliasPackage>
 	<ActionPackage />
 	<ScriptPackage>
@@ -946,15 +953,8 @@ function init()
 	mcp = mcp or {}
 	mcp_auth = mcp_auth or math.random(100000)
 
-	weapon = weapon or "WEAPON"
-	ammo = ammo or "AMMO"
-	fire_mode = fire_mode or "single"
-	ammo_count = ammo_count or 0
-	ammo_remaining = ammo_remaining or 0
-	magsize = mxagsize or 0
-
-	mcp["hp"] = mcp["hp"] or 30
-	mcp["maxhp"] = mcp["maxhp"] or 30
+	mcp["hp"]     = mcp["hp"]     or 30
+	mcp["maxhp"]  = mcp["maxhp"]  or 30
 	mcp["hunger"] = mcp["hunger"] or 0
 	mcp["thirst"] = mcp["thirst"] or 0
 	mcp["stress"] = mcp["stress"] or 0
@@ -977,20 +977,25 @@ function init()
 	--remember(area)
 	--remember(users)
 
-	window_width = 0
-	window_height = 0
-	window_width, window_height = getMainWindowSize()
-
-	position_room_window()
-	setMiniConsoleFontSize("room", 40)
+	window_width   = 0
+	window_height  = 0
+	sidebar_width  = 0
+	status_height  = 0
+	minimap_width  = 0
+	scroll_width   = 15
+	minimap_scale  = .3
 	
-	position_chat_window()
-	setMiniConsoleFontSize("chat", 14)
+	chat_console = true
+	
+	handleWindowResize()
+	
 	setWindowWrap("chat", 100)
 
-	position_status_window()
-	setMiniConsoleFontSize("status", 13)
+
+	-- if we have more packages then enable them here
 	
+	if (init_guns) then init_guns() end
+
 end
 
 registerAnonymousEventHandler("sysLoadEvent", "init()")
@@ -999,59 +1004,81 @@ registerAnonymousEventHandler("sysWindowResizeEvent", "handleWindowResize")
 
 function handleWindowResize()
 	window_width, window_height = getMainWindowSize()
+	sidebar_width = math.max(window_width / 2 - 15, 540)
+	minimap_width = math.min(320, minimap_scale * sidebar_width)
+	status_height = math.max(minimap_width - 15, 150)
+	
 	position_room_window()
-	position_status_window()
+	setMiniConsoleFontSize("room", determine_font_size(minimap_width, status_height, 10, 5, 16))
+	
+	
+	local chat_font_size = determine_font_size(sidebar_width, (window_height - status_height - 10), 100, 10, 8)
+	
+	if (chat_font_size &lt; 1) then
+		chat_console = false
+	else
+		chat_console = true
+	end
+	
 	position_chat_window()
+	setMiniConsoleFontSize("chat", chat_font_size)
+	
+	position_status_window()
+	setMiniConsoleFontSize("status", determine_font_size(sidebar_width - minimap_width, status_height, 75, 8, 4))
 end
 
 function position_room_window()
-	createMiniConsole("room", 0, 0, 320, 305)
-	moveWindow("room", window_width - 335, 0)
+	createMiniConsole("room", 0, 0, minimap_width, status_height)
+	moveWindow("room", window_width - minimap_width - scroll_width, 0)
 end
+
 function position_status_window()
-	createMiniConsole("status", 0, 0, 780, 305)
-	moveWindow("status", window_width - 1115, 0)
+	createMiniConsole("status", 0, 0, (sidebar_width - minimap_width - scroll_width), status_height)
+	moveWindow("status", sidebar_width, 0)
 end
+
 function position_chat_window()
-	createMiniConsole("chat", 0, 0, 1100, window_height - 315)
-	moveWindow("chat", window_width - 1115, 305)
+	if (chat_console) then
+			createMiniConsole("chat", 0, 0, (sidebar_width - scroll_width), (window_height - status_height - 10))
+			moveWindow("chat", sidebar_width, status_height)
+	else
+			createMiniConsole("chat", 0, 0, 0, 0)
+			moveWindow("chat", window_width, 0)
+	end
+end
+
+function determine_font_size(width, height, charwidth, charheight, min_size)
+	local max_size = 96
+	for i = max_size,min_size,-2 do
+		local x, y = calcFontSize(i)
+		if (width &gt;= x * charwidth) and (height &gt; y * charheight) then return i end
+	end
+	return -1
+end
+
+function determine_vert_size(pixels, min_size)
+	local max_size = 96
+	for i = max_size,min_size,-2 do
+		if (pixels &gt;= calcFontSize(i) * 2) then return i end
+	end
+	return -1
 end</script>
 			<eventHandlerList />
 		</Script>
-		<Script isActive="yes" isFolder="no">
-			<name>sysecho</name>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>internal</name>
 			<packageName></packageName>
 			<script>-------------------------------------------------
 --         Put your Lua functions here.        --
 --                                             --
 -- Note that you can also use external Scripts --
 -------------------------------------------------
-
-function sysecho(text)
-	cecho("\n&lt;dark_green:green&gt; \&gt; " .. text .. " ")
-end</script>
+</script>
 			<eventHandlerList />
-		</Script>
-		<Script isActive="yes" isFolder="no">
-			<name>newroom</name>
-			<packageName></packageName>
-			<script>-------------------------------------------------
---         Put your Lua functions here.        --
---                                             --
--- Note that you can also use external Scripts --
--------------------------------------------------
-
--- anything extra that happens whenever we see a new room goes here
-function newroom()
-	-- tempTimer(0.01, [[sysecho(room .. " " .. area .. " " .. time)]])
-	update_status()
-end</script>
-			<eventHandlerList />
-		</Script>
-		<Script isActive="yes" isFolder="no">
-			<name>is_user</name>
-			<packageName></packageName>
-			<script>-------------------------------------------------
+			<Script isActive="yes" isFolder="no">
+				<name>is_user</name>
+				<packageName></packageName>
+				<script>-------------------------------------------------
 --         Put your Lua functions here.        --
 --                                             --
 -- Note that you can also use external Scripts --
@@ -1068,12 +1095,12 @@ function is_user(userName)
 	end
 	return result
 end</script>
-			<eventHandlerList />
-		</Script>
-		<Script isActive="yes" isFolder="no">
-			<name>utility</name>
-			<packageName></packageName>
-			<script>-------------------------------------------------
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>table and string utility</name>
+				<packageName></packageName>
+				<script>-------------------------------------------------
 --         Put your Lua functions here.        --
 --                                             --
 -- Note that you can also use external Scripts --
@@ -1106,137 +1133,68 @@ function sanitize(str)
 	str = str:gsub("-", "%%%-")
 	return str
 end</script>
-			<eventHandlerList />
-		</Script>
-		<Script isActive="yes" isFolder="no">
-			<name>set weapon, ammo, magsize</name>
-			<packageName></packageName>
-			<script>-- anything we want to happen whenever we set up a new weapon goes here
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>sysecho</name>
+				<packageName></packageName>
+				<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
 
-function set_weapon(str)
-	--sysecho("setting weapon to " .. str)
-	weapon = str
-end
-
-function set_ammo(str)
-	--sysecho("setting ammo to " .. str)
-	ammo = str
-end
-
-function set_magsize(str)
-	--sysecho("setting magsize to " .. str)
-	magsize = str
+function sysecho(text)
+	cecho("\n&lt;dark_green:green&gt; \&gt; " .. text .. " ")
 end</script>
-			<eventHandlerList />
-		</Script>
-		<Script isActive="yes" isFolder="no">
-			<name>ammunition tracking</name>
+				<eventHandlerList />
+			</Script>
+		</ScriptGroup>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>status</name>
 			<packageName></packageName>
 			<script>-------------------------------------------------
 --         Put your Lua functions here.        --
 --                                             --
 -- Note that you can also use external Scripts --
 -------------------------------------------------
-
--- this stuff works so never ever change it
-
-function handle_repack(str)
-	--display(str)
-	ammo_count = 0
-	local ammo_table = string.split(str, ", ")
-	set_magsize(ammo_table[1])
-	local lastelement = string.sub(ammo_table[table.size(ammo_table)], 5)
-	ammo_table[table.size(ammo_table)] = lastelement
-	for key,value in pairs(ammo_table) do
-		ammo_count = ammo_count + value
-	end
-	--sysecho(ammo_count .. " remaining")
-end
-
-function handle_reload(ammoName, weaponName)
-	--sysecho("handling reload " .. ammoName .. "," .. weaponName)
-	set_ammo(ammoName)
-	set_weapon(weaponName)
-	reset_ammo()
-end
-
-function reset_ammo()
-	ammo_remaining = magsize
-end
-
-function handle_shot()
-	if (fire_mode == "auto") then
-		ammo_remaining = ammo_remaining - 3
-	else
-		ammo_remaining = ammo_remaining - 1
-	end
-	display_ammo()
-end
-
-function display_ammo()
-	--cecho(get_ammo_display())
-	update_status()
-end
-
-function get_ammo_display()
-	local output = "\n &lt;DarkSlateGray&gt;[&lt;yellow&gt;"
-	if (tonumber(magsize) &lt; 61) then
-		for i = 1,ammo_remaining do
-			output = output .. "|"
-		end
-		for i = ammo_remaining+1,magsize do
-			output = output .. " "
-		end
-	elseif (tonumber(magsize) &lt; 121) then -- DOUBLE STACK DISPLAY
-		for i = 1,math.floor(ammo_remaining / 2) do
-			output = output .. ":"
-		end
-		if (ammo_remaining % 2 == 1) then
-			if (magsize == ammo_remaining) then
-				output = output .. ";"
-			else
-				output = output .. "."
-			end
-		end
-		for i = 1,(math.floor(magsize/2) - math.ceil(ammo_remaining/2)) do
-			output = output .. " "
-		end
-	else -- QUAD STACK DISPLAY
-		local ammocounter = tonumber(ammo_remaining)
-		while (ammocounter &gt; 3) do
-			output = output .. ":"
-			ammocounter = ammocounter - 4
-		end
-		if (ammocounter == 3) then output = output .. ";"
-			elseif (ammocounter == 2) then output = output .. "."
-			elseif (ammocounter == 1) then output = output .. ","
-		end
-		for i = 1,(math.floor(magsize/4)-math.ceil(tonumber(ammo_remaining)/4)) do
-			output = output .. " "
-		end
-	end
-	output = output .. "&lt;DarkSlateGray&gt;] &lt;white&gt;[ " .. ammo_remaining .. "/" .. magsize .. " ] [" .. ammo_count + ammo_remaining - magsize .. "]"
-	return output
-end</script>
+</script>
 			<eventHandlerList />
-		</Script>
-		<Script isActive="yes" isFolder="no">
-			<name>status window</name>
-			<packageName></packageName>
-			<script>-------------------------------------------------
+			<Script isActive="yes" isFolder="no">
+				<name>newroom</name>
+				<packageName></packageName>
+				<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+
+-- anything extra that happens whenever we see a new room goes here
+function newroom()
+	-- tempTimer(0.01, [[sysecho(room .. " " .. area .. " " .. time)]])
+	update_status()
+end</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>status window</name>
+				<packageName></packageName>
+				<script>-------------------------------------------------
 --         Put your Lua functions here.        --
 --                                             --
 -- Note that you can also use external Scripts --
 -------------------------------------------------
 
 function update_status()
+	local ammo_display = ""
+	if (get_ammo_display) then ammo_display = "&lt;reset&gt;\n\n" .. get_ammo_display() end
 	clearWindow("status")
-	cecho("status", "\n\n&lt;yellow&gt;" .. room .. "&lt;reset&gt; (&lt;dark_goldenrod&gt;" .. area .. "&lt;reset&gt;) &lt;white&gt;" .. time
-		.. "&lt;reset&gt;\n\n" .. get_ammo_display()
-		.. "\n\n " .. get_health_display()
-		.. "\n " .. get_thirst_display()
-		.. "\n " .. get_hunger_display()
-		.. "\n " .. get_stress_display())
+	cecho("status", "\n&lt;yellow&gt;" .. room .. "&lt;reset&gt; (&lt;dark_goldenrod&gt;" .. area .. "&lt;reset&gt;) &lt;white&gt;" .. time
+		.. ammo_display
+		.. "\n\n" .. get_health_display()
+		.. "\n" .. get_thirst_display()
+		.. "\n" .. get_hunger_display()
+		.. "\n" .. get_stress_display())
 end
 
 function get_health_display()
@@ -1301,8 +1259,153 @@ function get_stress_display()
 	result = result .. "&lt;white&gt;] [ " .. string.format("%3d", stress) .. "/" .. 500 .. " ]&lt;reset&gt;"
 	return result
 end</script>
+				<eventHandlerList />
+			</Script>
+		</ScriptGroup>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>guns</name>
+			<packageName></packageName>
+			<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+</script>
 			<eventHandlerList />
-		</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>set weapon, ammo, magsize</name>
+				<packageName></packageName>
+				<script>-- anything we want to happen whenever we set up a new weapon goes here
+
+function set_weapon(str)
+	--sysecho("setting weapon to " .. str)
+	weapon = str
+end
+
+function set_ammo(str)
+	--sysecho("setting ammo to " .. str)
+	ammo = str
+end
+
+function set_magsize(str)
+	--sysecho("setting magsize to " .. str)
+	magsize = str
+end</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>ammunition tracking</name>
+				<packageName></packageName>
+				<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+
+-- this stuff works so never ever change it
+
+function handle_repack(str)
+	--display(str)
+	ammo_count = 0
+	local ammo_table = string.split(str, ", ")
+	set_magsize(ammo_table[1])
+	local lastelement = string.sub(ammo_table[table.size(ammo_table)], 5)
+	ammo_table[table.size(ammo_table)] = lastelement
+	for key,value in pairs(ammo_table) do
+		ammo_count = ammo_count + value
+	end
+	--sysecho(ammo_count .. " remaining")
+end
+
+function handle_reload(ammoName, weaponName)
+	--sysecho("handling reload " .. ammoName .. "," .. weaponName)
+	set_ammo(ammoName)
+	set_weapon(weaponName)
+	reset_ammo()
+end
+
+function reset_ammo()
+	ammo_remaining = magsize
+end
+
+function handle_shot()
+	if (fire_mode == "auto") then
+		ammo_remaining = ammo_remaining - 3
+	elseif (fire_mode == "burst") then
+		ammo_remaining = ammo_remaining - 2
+	else
+		ammo_remaining = ammo_remaining - 1
+	end
+	display_ammo()
+end
+
+function display_ammo()
+	--cecho(get_ammo_display())
+	update_status()
+end
+
+function get_ammo_display()
+	local output = "\n&lt;DarkSlateGray&gt;[&lt;yellow&gt;"
+	if (tonumber(magsize) &lt; 61) then
+		for i = 1,ammo_remaining do
+			output = output .. "|"
+		end
+		for i = ammo_remaining+1,magsize do
+			output = output .. " "
+		end
+	elseif (tonumber(magsize) &lt; 121) then -- DOUBLE STACK DISPLAY
+		for i = 1,math.floor(ammo_remaining / 2) do
+			output = output .. ":"
+		end
+		if (ammo_remaining % 2 == 1) then
+			if (magsize == ammo_remaining) then
+				output = output .. ";"
+			else
+				output = output .. "."
+			end
+		end
+		for i = 1,(math.floor(magsize/2) - math.ceil(ammo_remaining/2)) do
+			output = output .. " "
+		end
+	else -- QUAD STACK DISPLAY
+		local ammocounter = tonumber(ammo_remaining)
+		while (ammocounter &gt; 3) do
+			output = output .. ":"
+			ammocounter = ammocounter - 4
+		end
+		if (ammocounter == 3) then output = output .. ";"
+			elseif (ammocounter == 2) then output = output .. "."
+			elseif (ammocounter == 1) then output = output .. ","
+		end
+		for i = 1,(math.floor(magsize/4)-math.ceil(tonumber(ammo_remaining)/4)) do
+			output = output .. " "
+		end
+	end
+	output = output .. "&lt;DarkSlateGray&gt;] &lt;white&gt;[ " .. ammo_remaining .. "/" .. magsize .. " ] [" .. ammo_count + ammo_remaining - magsize .. "]"
+	return output
+end</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>init_guns</name>
+				<packageName></packageName>
+				<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+
+function init_guns()
+	weapon = weapon or "WEAPON"
+	ammo = ammo or "AMMO"
+	fire_mode = fire_mode or "single"
+	ammo_count = ammo_count or 0
+	ammo_remaining = ammo_remaining or 0
+	magsize = magsize or 0
+end</script>
+				<eventHandlerList />
+			</Script>
+		</ScriptGroup>
 	</ScriptPackage>
 	<KeyPackage />
 	<VariablePackage>
@@ -1316,7 +1419,7 @@ end</script>
 		<Variable>
 			<name>ammo_count</name>
 			<keyType>4</keyType>
-			<value>390</value>
+			<value>387</value>
 			<valueType>3</valueType>
 		</Variable>
 		<Variable>
@@ -1357,7 +1460,7 @@ end</script>
 			<Variable>
 				<name>thirst</name>
 				<keyType>4</keyType>
-				<value>69</value>
+				<value>27</value>
 				<valueType>4</valueType>
 			</Variable>
 			<Variable>
@@ -1381,14 +1484,14 @@ end</script>
 			<Variable>
 				<name>hunger</name>
 				<keyType>4</keyType>
-				<value>31</value>
+				<value>103</value>
 				<valueType>4</valueType>
 			</Variable>
 		</VariableGroup>
 		<Variable>
 			<name>time</name>
 			<keyType>4</keyType>
-			<value>5:12pm</value>
+			<value>5:34am</value>
 			<valueType>4</valueType>
 		</Variable>
 		<Variable>
@@ -1411,7 +1514,7 @@ end</script>
 		<Variable>
 			<name>magsize</name>
 			<keyType>4</keyType>
-			<value>0</value>
+			<value>40</value>
 			<valueType>4</valueType>
 		</Variable>
 	</VariablePackage>
