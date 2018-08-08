@@ -355,81 +355,6 @@ end</script>
 			</TriggerGroup>
 		</TriggerGroup>
 		<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-			<name>Detect room entry</name>
-			<script>map = matches[2]
-room = matches[3]
-area = matches[4]
-time = matches[5]
-
-clearWindow("room")
---selectCurrentLine()
---copy()
---appendBuffer("room")
-
-newroom()</script>
-			<triggerType>0</triggerType>
-			<conditonLineDelta>4</conditonLineDelta>
-			<mStayOpen>4</mStayOpen>
-			<mCommand></mCommand>
-			<packageName></packageName>
-			<mFgColor>#ff0000</mFgColor>
-			<mBgColor>#ffff00</mBgColor>
-			<mSoundFile></mSoundFile>
-			<colorTriggerFgColor>#000000</colorTriggerFgColor>
-			<colorTriggerBgColor>#000000</colorTriggerBgColor>
-			<regexCodeList>
-				<string>^(.{10})\s{2}(.+) \((.+)\) (\d{1,2}:\d{1,2}[ap]m)$</string>
-			</regexCodeList>
-			<regexCodePropertyList>
-				<integer>1</integer>
-			</regexCodePropertyList>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>Detect map</name>
-				<script>map = map .. "\n" .. matches[2]
-
-selectCurrentLine()
-copy()
-appendBuffer("room")
-</script>
-				<triggerType>0</triggerType>
-				<conditonLineDelta>0</conditonLineDelta>
-				<mStayOpen>0</mStayOpen>
-				<mCommand></mCommand>
-				<packageName></packageName>
-				<mFgColor>#ff0000</mFgColor>
-				<mBgColor>#ffff00</mBgColor>
-				<mSoundFile></mSoundFile>
-				<colorTriggerFgColor>#000000</colorTriggerFgColor>
-				<colorTriggerBgColor>#000000</colorTriggerBgColor>
-				<regexCodeList>
-					<string>^(.{10})</string>
-				</regexCodeList>
-				<regexCodePropertyList>
-					<integer>1</integer>
-				</regexCodePropertyList>
-			</Trigger>
-			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>Detect end of map</name>
-				<script>newroom()</script>
-				<triggerType>0</triggerType>
-				<conditonLineDelta>0</conditonLineDelta>
-				<mStayOpen>0</mStayOpen>
-				<mCommand></mCommand>
-				<packageName></packageName>
-				<mFgColor>#ff0000</mFgColor>
-				<mBgColor>#ffff00</mBgColor>
-				<mSoundFile></mSoundFile>
-				<colorTriggerFgColor>#000000</colorTriggerFgColor>
-				<colorTriggerBgColor>#000000</colorTriggerBgColor>
-				<regexCodeList>
-					<string>^\s{10}</string>
-				</regexCodeList>
-				<regexCodePropertyList>
-					<integer>1</integer>
-				</regexCodePropertyList>
-			</Trigger>
-		</Trigger>
-		<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>Capture chat</name>
 			<script>selectCurrentLine()
 copy()
@@ -454,6 +379,118 @@ appendBuffer("chat")
 				<integer>1</integer>
 			</regexCodePropertyList>
 		</Trigger>
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>Minimap</name>
+			<script></script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList />
+			<regexCodePropertyList />
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>Override for directional look</name>
+				<script>disableTrigger("Detect room entry")
+tempTimer(0.1, [[enableTrigger("Detect room entry")]])</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(?:To the \w+|Through it), you see:</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>Detect room entry</name>
+				<script>map = matches[2]
+room = matches[3]
+area = matches[4]
+time = matches[5]
+
+clearWindow("room")
+--selectCurrentLine()
+--copy()
+--appendBuffer("room")
+
+newroom()</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>4</conditonLineDelta>
+				<mStayOpen>4</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(.{10})\s{2}(.+) \((.+)\) (\d{1,2}:\d{1,2}[ap]m)$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>Detect map</name>
+					<script>map = map .. "\n" .. matches[2]
+
+selectCurrentLine()
+copy()
+appendBuffer("room")
+</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^(.{10})</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>Detect end of map</name>
+					<script>newroom()</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^\s{10}</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+			</Trigger>
+		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>MCP</name>
 			<script></script>
@@ -1024,7 +1061,7 @@ function handleWindowResize()
 	setMiniConsoleFontSize("chat", chat_font_size)
 	
 	position_status_window()
-	setMiniConsoleFontSize("status", determine_font_size(sidebar_width - minimap_width, status_height, 75, 8, 4))
+	setMiniConsoleFontSize("status", determine_font_size(sidebar_width - minimap_width, status_height, 45, 8, 4))
 end
 
 function position_room_window()
@@ -1034,7 +1071,7 @@ end
 
 function position_status_window()
 	createMiniConsole("status", 0, 0, (sidebar_width - minimap_width - scroll_width), status_height)
-	moveWindow("status", sidebar_width, 0)
+	moveWindow("status", window_width - sidebar_width, 0)
 end
 
 function position_chat_window()
@@ -1052,14 +1089,6 @@ function determine_font_size(width, height, charwidth, charheight, min_size)
 	for i = max_size,min_size,-2 do
 		local x, y = calcFontSize(i)
 		if (width &gt;= x * charwidth) and (height &gt; y * charheight) then return i end
-	end
-	return -1
-end
-
-function determine_vert_size(pixels, min_size)
-	local max_size = 96
-	for i = max_size,min_size,-2 do
-		if (pixels &gt;= calcFontSize(i) * 2) then return i end
 	end
 	return -1
 end</script>
@@ -1187,7 +1216,7 @@ end</script>
 
 function update_status()
 	local ammo_display = ""
-	if (get_ammo_display) then ammo_display = "&lt;reset&gt;\n\n" .. get_ammo_display() end
+	if (get_ammo_display) then ammo_display = "&lt;reset&gt;\n" .. get_ammo_display() end
 	clearWindow("status")
 	cecho("status", "\n&lt;yellow&gt;" .. room .. "&lt;reset&gt; (&lt;dark_goldenrod&gt;" .. area .. "&lt;reset&gt;) &lt;white&gt;" .. time
 		.. ammo_display
@@ -1198,25 +1227,25 @@ function update_status()
 end
 
 function get_health_display()
-	local hp = tonumber(mcp["hp"])
-	local maxhp = tonumber(mcp["maxhp"])
+	local bars = math.floor(tonumber(mcp["hp"])/2)
+	local spaces = 30 - bars
 	local result = "&lt;white&gt;[&lt;green:green&gt;"
-	for i = 1,hp do
+	for i = 1,bars do
 		result = result .. "|"
 	end
 	result = result .. "&lt;reset&gt;"
-	for i = hp,(maxhp-1) do
+	for i = 1,spaces do
 		result = result .. " "
 	end
-	result = result .. "&lt;white&gt;] [ " .. hp .. "/" .. maxhp .. " ]&lt;reset&gt;"
+	result = result .. "&lt;white&gt;] [  " .. string.format("%2d", tonumber(mcp["hp"])) .. "/" .. mcp["maxhp"] .. "  ]&lt;reset&gt;"
 	return result
 end
 
 function get_thirst_display()
 	local thirst = tonumber(mcp["thirst"])
 	local result = "&lt;white&gt;[&lt;blue:blue&gt;"
-	local bars = math.floor(thirst * 60 / 500)
-	local spaces = 60 - bars
+	local bars = math.floor(thirst * 30 / 500)
+	local spaces = 30 - bars
 	for i = 1,bars do
 		result = result .. "|"
 	end
@@ -1231,8 +1260,8 @@ end
 function get_hunger_display()
 	local hunger = tonumber(mcp["hunger"])
 	local result = "&lt;white&gt;[&lt;red:red&gt;"
-	local bars = math.floor(hunger * 60 / 500)
-	local spaces = 60 - bars
+	local bars = math.floor(hunger * 30 / 500)
+	local spaces = 30 - bars
 	for i = 1,bars do
 		result = result .. "|"
 	end
@@ -1247,8 +1276,8 @@ end
 function get_stress_display()
 	local stress = tonumber(mcp["stress"])
 	local result = "&lt;white&gt;[&lt;yellow:yellow&gt;"
-	local bars = math.floor(stress * 60 / 500)
-	local spaces = 60 - bars
+	local bars = math.floor(stress * 30 / 500)
+	local spaces = 30 - bars
 	for i = 1,bars do
 		result = result .. "|"
 	end
@@ -1346,14 +1375,14 @@ end
 
 function get_ammo_display()
 	local output = "\n&lt;DarkSlateGray&gt;[&lt;yellow&gt;"
-	if (tonumber(magsize) &lt; 61) then
+	if (tonumber(magsize) &lt; 31) then
 		for i = 1,ammo_remaining do
 			output = output .. "|"
 		end
 		for i = ammo_remaining+1,magsize do
 			output = output .. " "
 		end
-	elseif (tonumber(magsize) &lt; 121) then -- DOUBLE STACK DISPLAY
+	elseif (tonumber(magsize) &lt; 61) then -- DOUBLE STACK DISPLAY
 		for i = 1,math.floor(ammo_remaining / 2) do
 			output = output .. ":"
 		end
@@ -1411,21 +1440,9 @@ end</script>
 	<VariablePackage>
 		<HiddenVariables />
 		<Variable>
-			<name>ammo</name>
+			<name>weapon</name>
 			<keyType>4</keyType>
-			<value>hand-loaded 5.56mm clip</value>
-			<valueType>4</valueType>
-		</Variable>
-		<Variable>
-			<name>ammo_count</name>
-			<keyType>4</keyType>
-			<value>387</value>
-			<valueType>3</valueType>
-		</Variable>
-		<Variable>
-			<name>ammo_remaining</name>
-			<keyType>4</keyType>
-			<value>40</value>
+			<value>FN SCAR-L rifle</value>
 			<valueType>4</valueType>
 		</Variable>
 		<VariableGroup>
@@ -1441,9 +1458,21 @@ end</script>
 			</Variable>
 		</VariableGroup>
 		<Variable>
-			<name>weapon</name>
+			<name>ammo_remaining</name>
 			<keyType>4</keyType>
-			<value>FN SCAR-L rifle</value>
+			<value>40</value>
+			<valueType>4</valueType>
+		</Variable>
+		<Variable>
+			<name>ammo_count</name>
+			<keyType>4</keyType>
+			<value>387</value>
+			<valueType>3</valueType>
+		</Variable>
+		<Variable>
+			<name>ammo</name>
+			<keyType>4</keyType>
+			<value>hand-loaded 5.56mm clip</value>
 			<valueType>4</valueType>
 		</Variable>
 		<Variable>
@@ -1460,7 +1489,7 @@ end</script>
 			<Variable>
 				<name>thirst</name>
 				<keyType>4</keyType>
-				<value>27</value>
+				<value>74</value>
 				<valueType>4</valueType>
 			</Variable>
 			<Variable>
@@ -1484,14 +1513,14 @@ end</script>
 			<Variable>
 				<name>hunger</name>
 				<keyType>4</keyType>
-				<value>103</value>
+				<value>34</value>
 				<valueType>4</valueType>
 			</Variable>
 		</VariableGroup>
 		<Variable>
 			<name>time</name>
 			<keyType>4</keyType>
-			<value>5:34am</value>
+			<value>11:25am</value>
 			<valueType>4</valueType>
 		</Variable>
 		<Variable>
