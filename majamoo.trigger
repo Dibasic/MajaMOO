@@ -1442,7 +1442,7 @@ end</script>
 		<Variable>
 			<name>weapon</name>
 			<keyType>4</keyType>
-			<value>FN SCAR-L rifle</value>
+			<value></value>
 			<valueType>4</valueType>
 		</Variable>
 		<VariableGroup>
@@ -1453,26 +1453,26 @@ end</script>
 			<Variable>
 				<name>1</name>
 				<keyType>3</keyType>
-				<value>MAJA</value>
+				<value></value>
 				<valueType>4</valueType>
 			</Variable>
 		</VariableGroup>
 		<Variable>
 			<name>ammo_remaining</name>
 			<keyType>4</keyType>
-			<value>40</value>
+			<value></value>
 			<valueType>4</valueType>
 		</Variable>
 		<Variable>
 			<name>ammo_count</name>
 			<keyType>4</keyType>
-			<value>387</value>
+			<value></value>
 			<valueType>3</valueType>
 		</Variable>
 		<Variable>
 			<name>ammo</name>
 			<keyType>4</keyType>
-			<value>hand-loaded 5.56mm clip</value>
+			<value></value>
 			<valueType>4</valueType>
 		</Variable>
 		<Variable>
@@ -1489,61 +1489,56 @@ end</script>
 			<Variable>
 				<name>thirst</name>
 				<keyType>4</keyType>
-				<value>74</value>
+				<value></value>
 				<valueType>4</valueType>
 			</Variable>
 			<Variable>
 				<name>stress</name>
 				<keyType>4</keyType>
-				<value>0</value>
+				<value></value>
 				<valueType>4</valueType>
 			</Variable>
 			<Variable>
 				<name>maxhp</name>
 				<keyType>4</keyType>
-				<value>49</value>
+				<value></value>
 				<valueType>4</valueType>
 			</Variable>
 			<Variable>
 				<name>hp</name>
 				<keyType>4</keyType>
-				<value>49</value>
+				<value></value>
 				<valueType>4</valueType>
 			</Variable>
 			<Variable>
 				<name>hunger</name>
 				<keyType>4</keyType>
-				<value>34</value>
+				<value></value>
 				<valueType>4</valueType>
 			</Variable>
 		</VariableGroup>
 		<Variable>
 			<name>time</name>
 			<keyType>4</keyType>
-			<value>11:25am</value>
+			<value></value>
 			<valueType>4</valueType>
 		</Variable>
 		<Variable>
 			<name>area</name>
 			<keyType>4</keyType>
-			<value>helliday inn 2nd floor</value>
+			<value></value>
 			<valueType>4</valueType>
 		</Variable>
 		<Variable>
 			<name>map</name>
 			<keyType>4</keyType>
-			<value>          
-          
-[][][]    
-[]//()    
-[][][]    
-          </value>
+			<value></value>
 			<valueType>4</valueType>
 		</Variable>
 		<Variable>
 			<name>magsize</name>
 			<keyType>4</keyType>
-			<value>40</value>
+			<value></value>
 			<valueType>4</valueType>
 		</Variable>
 	</VariablePackage>
